@@ -59,11 +59,48 @@ st.subheader('그래프')
 # hist_values = np.histogram(data['credit_r'], data['occyp_type'].value_counts().index)
 # st.bar_chart(hist_values)
 
-st.plotly_chart(data, use_container_width=False, sharing="streamlit")
-import plotly.graph_objects as go
-fig = go.Figure(data)
-fig.show()
-st.plotly_chart(fig, use_container_width=True)
+# st.plotly_chart(data, use_container_width=False, sharing="streamlit")
+# import plotly.graph_objects as go
+# fig = go.Figure(data)
+# fig.show()
+# st.plotly_chart(fig, use_container_width=True)
+
+def graph(col1,col2):
+    df = data.groupby(by=[col1,col2]).count()
+    # df = df.groupby(level=0).apply(lambda x: 100 * x / x.sum()).reset_index()
+    df = df.groupby(level=0).apply(lambda x: x).reset_index()
+
+    # fig = px.bar(df, color_discrete_sequence=["rgb(179,226,205)", "rgb(203,213,232)"],x=col1, y='Unnamed: 0', color=col2,
+    fig = px.bar(df, color_discrete_sequence=px.colors.qualitative.Pastel1,x=col1, y='Unnamed: 0', color=col2,
+                
+                category_orders={col1: data[col1].values,
+
+                                col2:data[col2].values},
+                labels={
+                        col1: col1,
+                        "Unnamed: 0": "숫자",
+                        col2: col2
+                        },)
+
+    fig.update_layout(title='그래프')
+    fig.show()
+
+#plotly bar차트
+data = data.groupby(by=['gender', 'credit_r']).count()
+data = data.groupby(level=0).apply(lambda x: x).reset_index()
+fig2 = px.bar(data, color_discrete_sequence=px.colors.qualitative.Pastel1,x='gender', y='credit_r', color='credit_r',
+                
+                category_orders={'gender': data['credit_r'].values,
+
+                                'credit_r':data['gender'].values},
+                labels={
+                        'gender': 'gender',
+                        "Unnamed: 0": "숫자",
+                        'credit_r': 'credit_r'
+                        },)
+st.plotly_chart(fig2)
+# st.plotly_chart(graph('credit_r','gender'))
+
 
 
 if st.checkbox('Show raw data'):
