@@ -3,12 +3,12 @@
 ## 👤구성원
 
 ### 조장
-김재헌 : [GitHub]()
+김재헌 : [GitHub](https://github.com/gemjh)
 
 ### 조원
 고인정 : [GitHub](https://github.com/8bitHermitcrab)
 
-박경태 : [GitHub]()
+박경태 : [GitHub](https://github.com/ParkKyungTae)
 
 지호 : [GitHub](https://github.com/jiho4399)
 
