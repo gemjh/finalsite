@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.figure_factory as ff
+from persist import persist, load_widget_state
 
 st.title('신용카드 사용자 신용도 예측 서비스')
 

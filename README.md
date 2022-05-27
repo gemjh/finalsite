@@ -34,3 +34,18 @@
 13. 양식 바로 위에 Able to merge 가 쓰여있으면 Create Pull Request 누르기
 
 (`git checkout <브랜치명>` 으로 현재 브랜치를 변경해서 사용 가능)
+
+
+### 환경설정 서버에 올리기
+```
+pip freeze > requirements.txt  # freeze내용을 requirements.txt라는 파일로 내보내겠다.
+pip install -r requirements.txt # pip로 install하는 걸 requirements.txt 를 읽어서 하겠다.
+```
+```
+# 만약 conda를 쓰면
+conda env export > filename.yaml # filename으로 env를 내보내겠다.
+conda env create -f filename.yaml # filename으로 환경을 새로 만들겠다.
+
+conda env update --prefix ./env --file filename.yaml --prune # update - 공식문서 참조
+# https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html
+```
