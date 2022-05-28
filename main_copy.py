@@ -5,6 +5,7 @@ import numpy as np
 import plotly.express as px
 from persist import persist, load_widget_state
 from catboost_model_sample import preprocessing, train_model, result
+from catboost import CatBoostClassifier # 05/28
 
 
 def main():
@@ -34,7 +35,8 @@ def main():
 def total_graph():
     st.subheader('전체 표 보기')
     # st.title('신용카드 사용자 신용도 예측 서비스')
-    DATA_PATH = ('/Users/kij/projects/finalsite/data/')
+    # DATA_PATH = ('/Users/kij/projects/finalsite/data/')
+    DATA_PATH = ('/Users/jiho/Desktop/mulcam_final/data/')
 
     # # train 차트 불러오기
     # @st.cache
@@ -95,9 +97,12 @@ def total_graph():
     model_cat, X_train = train_model(pre_train, pre_test)
     # 모델 학습 출력
     st.write(model_cat, X_train)
-
+    from_file = CatBoostClassifier()  # 5/28
+    from_file.load_model("/Users/jiho/Desktop/mulcam_final/data/model.bin") # 5/28
+    
     # 학습 결과
-    y_predict = result(model_cat, X_train)
+    # y_predict = result(model_cat, X_train)
+    y_predict = from_file.predict(X_train) # 5/28
     # 학습 결과 출력
     st.write(y_predict)
 
