@@ -4,11 +4,7 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 from persist import persist, load_widget_state
-# from catboost_model_sample import preprocessing, model
-
-
-# 메뉴 번역
-# 메뉴 선택 방식 (라디오버튼, 셀렉트박스, 텍스트)
+from catboost_model_sample import preprocessing, train_model, result
 
 
 def main():
@@ -40,43 +36,70 @@ def total_graph():
     # st.title('신용카드 사용자 신용도 예측 서비스')
     DATA_PATH = ('/Users/kij/projects/finalsite/data/')
 
-    @st.cache
-    def load_data(nrows):
-        train = pd.read_csv(DATA_PATH + 'final_df.csv', nrows=nrows)
-        test = pd.read_csv(DATA_PATH + 'final_test_df.csv', nrows=nrows)
-        train.drop('Unnamed: 0', axis=1, inplace=True)
-        return train, test
+    # # train 차트 불러오기
+    # @st.cache
+    # def load_train(nrows):
+    #     train = pd.read_csv(DATA_PATH + 'final_df.csv', nrows=nrows)
+    #     # train = pd.read_csv(DATA_PATH + 'final_df.csv')
+    #     train.drop(['credit_r', 'DAYS_EMPLOYED'], axis=1, inplace=True)
+    #     train.drop('Unnamed: 0', axis=1, inplace=True)
+    #     return train
 
+    # # test 차트 불러오기
+    # @st.cache
+    # def load_test(nrows):
+    #     test = pd.read_csv(DATA_PATH + 'final_test_df.csv', nrows=nrows)
+    #     # test = pd.read_csv(DATA_PATH + 'final_test_df.csv')
+    #     test.drop(['DAYS_EMPLOYED'], axis=1, inplace=True)
+    #     return test
+
+    # 불러온 차트 보여주기
     data_load_state = st.text('Loading data...')
-    train, test = load_data(10)
+    train = pd.read_csv(DATA_PATH + 'final_df.csv')
+    train.drop(['credit_r', 'DAYS_EMPLOYED'], axis=1, inplace=True)
+    train.drop('Unnamed: 0', axis=1, inplace=True)
+    test = pd.read_csv(DATA_PATH + 'final_test_df.csv')
+    test.drop(['DAYS_EMPLOYED'], axis=1, inplace=True)
+    # test = load_test(10)
     data_load_state.text("Done! (using st.cache)")
 
 
     #plotly bar차트
-    # data = train.groupby(by=['gender', 'credit_r']).count()
-    # data = train.groupby(level=0).apply(lambda x: x).reset_index()
-    # fig2 = px.bar(data, color_discrete_sequence=px.colors.qualitative.Pastel1,x='gender', y='credit_r', color='credit_r',
+    train_data = train.groupby(by=['gender', 'credit']).count()
+    train_data = train.groupby(level=0).apply(lambda x: x).reset_index()
+    fig2 = px.bar(train_data, color_discrete_sequence=px.colors.qualitative.Pastel1,x='gender', y='credit', color='credit',
                     
-    #                 category_orders={'gender': data['credit_r'].values,
+                    category_orders={'gender': train_data['credit'].values,
 
-    #                                 'credit_r':data['gender'].values},
-    #                 labels={
-    #                         'gender': 'gender',
-    #                         "Unnamed: 0": "숫자",
-    #                         'credit_r': 'credit_r'
-    #                         },)
-    # st.plotly_chart(fig2)
+                                    'credit':train_data['gender'].values},
+                    labels={
+                            'gender': 'gender',
+                            "Unnamed: 0": "숫자",
+                            'credit': 'credit'
+                            },)
+    st.plotly_chart(fig2)
 
 
 
     if st.checkbox('Show raw data'):
         st.subheader('Raw data')
         st.write(train)
+        st.write(test)
 
-        
-        # st.write(preprocessing(train, test))
-        # st.write(train_model(data))
-        # st.write(result())
+    # 데이터 전처리
+    pre_train, pre_test = preprocessing(train, test)
+    # 데이터 전처리 출력
+    st.write(pre_train, pre_test)
+
+    # 모델 학습
+    model_cat, X_train = train_model(pre_train, pre_test)
+    # 모델 학습 출력
+    st.write(model_cat, X_train)
+
+    # 학습 결과
+    y_predict = result(model_cat, X_train)
+    # 학습 결과 출력
+    st.write(y_predict)
 
 
     st.write(
@@ -151,6 +174,3 @@ PAGES = {
 if __name__ == "__main__":
     load_widget_state()
     main()
-    # preprocessing()
-    # train_model()
-    # result()
