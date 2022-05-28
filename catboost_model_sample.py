@@ -83,8 +83,8 @@ def train_model(train, test):
     n_est = 2000
     seed = 42
     n_class = 3
-    # n_fold = 18
-    n_fold = 3
+    n_fold = 18
+    # n_fold = 3
 
     target = 'credit'
     X = train.drop(target, axis=1)
@@ -117,6 +117,7 @@ def train_model(train, test):
         cat_pred[valid_idx] = model_cat.predict_proba(X_valid)
         cat_pred_test += model_cat.predict_proba(X_test) / n_fold
         # print(f'CV Log Loss Score: {log_loss(y_valid, cat_pred[valid_idx]):.6f}')
+    model_cat.save_model('/content/drive/MyDrive/final_project/model.bin') #5/28수정
     return model_cat, X_train
 
 
@@ -128,3 +129,13 @@ def result(model_cat, X_train):
     # print('='*60)
 
     return y_predict
+
+
+# 5/28 수정
+preprocessing(train, test)
+
+train_model(train, test)
+
+from_file = CatBoostClassifier()
+from_file.load_model("/content/drive/MyDrive/final_project/model.bin")
+from_file.predict(X_train)
