@@ -132,10 +132,10 @@ def result(model_cat, X_train):
 
 
 # 5/28 수정
-preprocessing(train, test)
+# preprocessing(train, test)
 
-train_model(train, test)
+# train_model(train, test)
 
-from_file = CatBoostClassifier()
-from_file.load_model("/content/drive/MyDrive/final_project/model.bin")
-from_file.predict(X_train)
+# from_file = CatBoostClassifier()
+# from_file.load_model("/content/drive/MyDrive/final_project/model.bin")
+# from_file.predict(X_train)
