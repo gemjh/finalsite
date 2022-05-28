@@ -5,7 +5,7 @@ import numpy as np
 import plotly.express as px
 from persist import persist, load_widget_state
 from catboost_model_sample import preprocessing, train_model, result
-from catboost import CatBoostClassifier # 5/28
+from catboost import CatBoostClassifier # 05/28
 
 
 def main():
