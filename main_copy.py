@@ -186,9 +186,9 @@ def total_graph():
 
 
     # 모델 학습
-    # model_cat, X_train = train_model(pre_train, pre_test)
+    model_cat, X_train = train_model(pre_train, pre_test)
     # model_cat.save_model('/Users/jiho/Desktop/mulcam_final/data/model.bin') # 5/28
-    # model_cat.save_model("./data/model.bin")
+    model_cat.save_model("./data/model.bin")
 
     # 모델 학습 출력
     # st.write(model_cat, X_train)
