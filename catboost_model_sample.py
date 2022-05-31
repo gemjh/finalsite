@@ -117,7 +117,7 @@ def train_model(train, test):
         cat_pred[valid_idx] = model_cat.predict_proba(X_valid)
         cat_pred_test += model_cat.predict_proba(X_test) / n_fold
         # print(f'CV Log Loss Score: {log_loss(y_valid, cat_pred[valid_idx]):.6f}')
-    model_cat.save_model('/content/drive/MyDrive/final_project/model.bin') #5/28수정
+    # model_cat.save_model('/Users/jiho/Desktop/mulcam_final/data/model.bin') #5/28수정
     return model_cat, X_train
 
 
