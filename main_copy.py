@@ -1,11 +1,17 @@
+import os
 import streamlit as st
 # from multiapp import MultiApp
 import pandas as pd
 import numpy as np
 import plotly.express as px
 from persist import persist, load_widget_state
-from catboost_model_sample import preprocessing, train_model, result
+from catboost_model_sample import preprocessing, train_model, result, zerone
 from catboost import CatBoostClassifier # 05/28
+from io import BytesIO
+
+import pandas_profiling
+
+from streamlit_pandas_profiling import st_profile_report
 
 
 def main():
@@ -16,7 +22,7 @@ def main():
             "page": "home",
 
             # Radio, selectbox and multiselect options.
-            "gender_options": ["F", "M"],
+            "gender_options": ["여자", "남자"],
 
             # 기본값
             "text": "",
@@ -175,11 +181,27 @@ def total_graph():
     #     st.write(test)
 
     train = pd.read_csv(DATA_PATH + 'final_df.csv')
+    # train.drop('credit', axis=1, inplace=True)
     # train.drop('Unnamed: 0', axis=1, inplace=True)
-    X_train = pd.read_csv(DATA_PATH + 'service.csv')
+    X_train = pd.read_csv(DATA_PATH + 'input_list.csv')
+    X_train=zerone(X_train)
+    # a = train.profile_report()
+    # b = X_train.profile_report()
+    # st_profile_report(a)
+    # st_profile_report(b)
+    # a = pd.read_csv(DATA_PATH + 'service.csv')
+    print(X_train.info())
+    # print("-"*10)
+    # print(a[X_train.columns].info())
+    # 1. 사용자 input 저장 ( DB vs CSV)
+    # 2. model -> data를 뭘 사용? (train데이터로 학습된 모델 사용)
+    # -> 
+
+
     # pre_train, pre_test = preprocessing(train, test)
     # pre_train, pre_X_train = preprocessing(train, X_train)
     preprocessing(train, X_train)
+    # preprocessing(train, a)
     # 데이터 전처리 출력
     # st.write(pre_train, pre_test)
     # st.write(pre_train, pre_X_train)
@@ -198,6 +220,11 @@ def total_graph():
 
     # 학습 결과
     # y_predict = result(model_cat, X_train)
+    
+    # b = from_file.predict(train)
+    
+    print("AAAA")
+
     y_predict = from_file.predict(X_train) # 5/28
     # 학습 결과 출력
     st.write(y_predict)
@@ -218,29 +245,30 @@ def total_graph():
 
 
 
+    
 def my_settings():
     st.header("정보를 입력해주세요")
 
-    st.radio('성별', st.session_state["gender_options"], key=persist("gender"))
-    st.text_input('나이')
-    st.selectbox('학력',('Higher education' ,'Secondary / secondary special', 'Incomplete higher', 'Lower secondary', 'Academic degree'))
-    st.text_input('소득','0')
-    st.text_input('아이 수','0')
-    st.text_input('고용연수','0')
-    st.radio('직장 전화',('있음','없음'))
-    st.radio('집 전화',('있음','없음'))
-    st.radio('이메일',('있음','없음'))
-    st.radio('자동차',('있음','없음'))
-    st.radio('부동산',('있음','없음'))
-    st.selectbox('소득 형태',('Commercial associate', 'Pensioner', 'State servant', 'Student', 'Working'))
-    st.selectbox('가족 형태',('Civil marriage', 'Married', 'Separated', 'Single / not married', 'Widow'))
-    st.selectbox('집 형태',('Co-op apartment',
+    gender=st.radio('성별', st.session_state["gender_options"], key=persist("gender"))
+    DAYS_BIRTH=st.text_input('나이')
+    edu_type=st.selectbox('학력',('Higher education' ,'Secondary / secondary special', 'Incomplete higher', 'Lower secondary', 'Academic degree'))
+    income_total=st.text_input('소득','0')
+    child_num=st.text_input('아이 수','0')
+    DAYS_EMPLOYED_r=st.text_input('고용연수','0')
+    work_phone=st.radio('직장 전화',('있음','없음'))
+    phone=st.radio('집 전화',('있음','없음'))
+    email=st.radio('이메일',('있음','없음'))
+    car=st.radio('자동차',('있음','없음'))
+    reality=st.radio('부동산',('있음','없음'))
+    income_type=st.selectbox('소득 형태',('Commercial associate', 'Pensioner', 'State servant', 'Student', 'Working'))
+    family_type=st.selectbox('가족 형태',('Civil marriage', 'Married', 'Separated', 'Single / not married', 'Widow'))
+    house_type=st.selectbox('집 형태',('Co-op apartment',
         'House / apartment',
         'Municipal apartment',
         'Office apartment',
         'Rented apartment',
         'With parents'))
-    st.selectbox('직업',('Accountants',
+    occyp_type=st.selectbox('직업',('Accountants',
         'Cleaning staff',
         'Cooking staff',
         'Core staff',
@@ -258,9 +286,44 @@ def my_settings():
         'Secretaries',
         'Security staff',
         'Waiters/barmen staff',
-        'jobless'))
-    st.text_input('가족 규모','0')
-    # st.text_input('신용카드 발급 개월수', '0')
+        'job_less'))
+
+
+    family_size=st.text_input('가족 규모','0')
+    begin_month=25.0
+    # 7, 24, 26
+    is_submit = st.button("제출", )
+    if is_submit:
+
+        # st.text_input('신용카드 발급 개월수', '0')
+        input_dict = dict(
+            gender=gender,
+            car=car,
+            reality=reality,
+            child_num=child_num,
+            income_total=income_total,
+            income_type=income_type,
+            edu_type=edu_type,
+            family_type=family_type,
+            house_type=house_type,
+            DAYS_BIRTH=DAYS_BIRTH,
+            DAYS_EMPLOYED_r=DAYS_EMPLOYED_r,
+            work_phone=work_phone,
+            phone=phone,
+            email=email,
+            occyp_type=occyp_type,
+            family_size=family_size,
+            begin_month=begin_month
+        )
+        filename = './data/input_list.csv'
+        if not os.path.exists(filename):
+            pd.DataFrame([], columns=input_dict.keys()).to_csv(filename, mode='w' ,header=True, index=False)
+        print("Hello World")
+        a = pd.DataFrame([input_dict])
+        a.to_csv(filename, mode='a', header=False, index=False)
+
+        # 다른페이지로 이동
+        # 결과 출력 
 
 
 def my_graph():
